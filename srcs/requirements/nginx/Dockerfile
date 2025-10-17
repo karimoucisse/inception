@@ -1,4 +1,4 @@
-FROM debian:13.0
+FROM debia:buster
 
 RUN apt-get update && apt-get upgrade -y
 
