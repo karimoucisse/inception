@@ -1,27 +1,28 @@
-FROM debia:buster
+FROM debian:13.0
 
-RUN apt-get update && apt-get upgrade -y
+RUN apt-get -y update && apt-get -y upgrade && \
+	apt-get -y install nginx openssl
 
-RUN apt-get install -y nginx openssl
-RUN apt-get clean
+RUN mkdir -p /etc/nginx/sites-enabled/ /etc/nginx/sites-available/ /etc/nginx/tls \
+			/var/www/site /var/www/wordpress
 
-RUN mkdir -p /etc/ssl/private
-RUN mkdir -p /etc/ssl/certs
-# sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout
-# /etc/nginx/ssl/nginx-selfsigned.key -out /etc/nginx/ssl/nginx-selfsigned.crt
+COPY conf/nginx.conf /etc/nginx/nginx.conf
 
+# SSL CONF
+RUN openssl req -x509 -nodes -days 365 -out /etc/nginx/tls/tls.crt \
+	-keyout /etc/nginx/tls/tls.key \
+	-subj "/C=FR/ST=IDF/L=Paris/O=42/OU=42/CN=login.42.fr"
+COPY conf/tls/tls.conf /etc/nginx/sites-available/tls.conf
+RUN ln -s /etc/nginx/sites-available/tls.conf /etc/nginx/sites-enabled/tls.conf
 
-# RUN openssl req -x509 -nodes -out /etc/nginx/ssl/inception.crt -keyout \
-#     /etc/ssl/inception.key -subj \
-# 	"/C=MO/ST=KH/L=KH/O=42/OU=42/CN=domain_name.fr/UID=admin_name"
+# WEB SITE CONF
+COPY content/index.html /var/www/site/
+COPY conf/sites/site.conf /etc/nginx/sites-available/site.conf
+RUN ln -s /etc/nginx/sites-available/site.conf /etc/nginx/sites-enabled/site.conf
 
-RUN bash $PWD/conf/tsl-key_gen.bash
-
-# COPY ./conf/nginx.conf /etc/nginx/nginx.conf
-
-ADD $PWD/conf/nginx.conf /etc/nginx/nginx.conf
-
-EXPOSE 80
-EXPOSE 443
+EXPOSE 80 443
 
 CMD ["nginx", "-g", "daemon off;"]
+
+
+
