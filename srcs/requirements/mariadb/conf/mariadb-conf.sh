@@ -1,11 +1,9 @@
 #!/bin/bash
 set -e
 
-# Démarrer MariaDB sans systemd
 echo "Starting MariaDB..."
 mysqld_safe &
 
-# Attendre que le serveur démarre
 sleep 5
 
 echo "Creating user 'jtech'..."
@@ -16,5 +14,4 @@ mariadb -e "FLUSH PRIVILEGES;"
 
 echo "MariaDB ready and user created."
 
-# Garder le conteneur en vie
 wait
