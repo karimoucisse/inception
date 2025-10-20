@@ -24,8 +24,11 @@ wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 
 sleep 5
 
+chmod +x wp-cli.phar
+mv wp-cli.phar /usr/local/bin/wp
+
 wp config create	--allow-root \
-					--dbname=$SQL_DATABASE \
-					--dbuser=$SQL_USER \
-					--dbpass=$SQL_PASSWORD \
-					--dbhost=mariadb:3306 --path=$WORDPRESS_PATH
+					--dbname='wordpress' \
+					--dbuser='test'\
+					--dbpass='test123' \
+					--dbhost='mariadb:3306' --path='/var/www/wordpress'
