@@ -1,8 +1,9 @@
 FROM debian:12.0
 
-RUN apt-get update -y && apt-get upgrade -y && \
-	apt-get install -y mariadb-server && \
-	mkdir -p /run/mysqld && chown -R mysql:mysql /run/mysqld
+RUN apt-get -y update && apt-get -y upgrade && \
+	apt-get -y install mariadb-server
+
+RUN mkdir -p /run/mysqld && chown -R mysql:mysql /run/mysqld
 
 COPY conf/50-custom.conf /etc/mysql/mariadb.conf.d/50-custom.conf
 
