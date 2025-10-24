@@ -1,21 +1,34 @@
 #!/bin/bash
 set -e
 
-echo "Starting MariaDB..."
-mysqld_safe &
+echo "🚀 Starting MariaDB setup..."
 
+# Vérifier que les variables sont bien reçues
+echo "DB_NAME=$DB_NAME"
+echo "DB_USER=$DB_USER"
+
+if [ -z "$DB_NAME" ] || [ -z "$DB_USER" ] || [ -z "$DB_PASS" ]; then
+  echo "❌ Missing environment variables: DB_NAME, DB_USER, or DB_PASS"
+  env  # debug
+  exit 1
+fi
+
+# Démarrer MariaDB temporairement pour configurer la base
+echo "Starting MariaDB temporarily..."
+mysqld_safe --skip-networking &
 sleep 5
 
-echo "Creating DATABASE $SQL_DATABASE..."
-CREATE DATABASE $SQL_DATABASE;
-
-
-echo "Creating user $SQL_USER..."
-# mariadb -e "ALTER USER 'root'@'%' IDENTIFIED BY 'tonmotdepasse';"
-mariadb -e "CREATE USER IF NOT EXISTS $SQL_USER@'%' IDENTIFIED BY $SQL_PASSWORD;"
-mariadb -e "GRANT ALL PRIVILEGES ON *.* TO '$SQL_USER@'%' WITH GRANT OPTION;"
+# Création de la base et de l'utilisateur
+echo "Creating database and user..."
+mariadb -e "CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\`;"
+mariadb -e "CREATE USER IF NOT EXISTS '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASS}';"
+mariadb -e "GRANT ALL PRIVILEGES ON \`${DB_NAME}\`.* TO '${DB_USER}'@'%' WITH GRANT OPTION;"
 mariadb -e "FLUSH PRIVILEGES;"
 
-echo "MariaDB ready and user created."
+echo "✅ MariaDB configured successfully."
 
-wait
+# Arrêter le serveur temporaire proprement
+mysqladmin shutdown
+
+# Redémarrer en mode normal (foreground)
+exec mysqld_safe

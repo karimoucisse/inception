@@ -8,13 +8,13 @@ RUN apt-get update -y && apt-get upgrade -y && \
 
 RUN mkdir -p /var/www
 
-WORKDIR /var/www
+# WORKDIR /var/www
 
 EXPOSE 80
 
-COPY conf/wordpress-conf.sh /var/www/wordpress-conf.sh
+COPY conf/wordpress-conf.sh /wordpress-conf.sh
 
-RUN chmod +x /var/www/wordpress-conf.sh
+RUN chmod +x /wordpress-conf.sh
 
 
-ENTRYPOINT [ "/var/www/wordpress-conf.sh" ]
+ENTRYPOINT [ "/wordpress-conf.sh" ]
