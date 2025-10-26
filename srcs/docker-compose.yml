@@ -1,8 +1,7 @@
-version: "3"
-
 services:
   nginx:
     container_name: nginx
+    image: nginx
     env_file: .env
     volumes:
       - wordpress:/var/www/wordpress
@@ -10,6 +9,7 @@ services:
       - inception
     depends_on:
       - wordpress
+      - mariadb
     build: requirements/nginx
     ports:
       - "443:443"
@@ -17,8 +17,8 @@ services:
 
   mariadb:
     container_name: mariadb
-    env_file: .env
     image: mariadb
+    env_file: .env
     build: requirements/mariadb
     networks:
       - inception
@@ -40,11 +40,14 @@ services:
       - mariadb
     build: requirements/wordpress
     restart: on-failure
+    ports:
+    - "8080:80"
     expose:
       - "9000"
 
 volumes:
   wordpress:
+    name: wordpress
     driver: local
     driver_opts:
       type: none
@@ -52,6 +55,7 @@ volumes:
       device: /home/cisse/data/wordpress
 
   mariadb:
+    name: mariadb
     driver: local
     driver_opts:
       type: none
